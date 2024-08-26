@@ -39,7 +39,7 @@ class RelationNetworks(nn.Module):
 
         self.embed = nn.Embedding(n_vocab, embed_dim)
 
-        self.n_concat = (
+        self.n_concat =(
             channels_out * 2 + latents_dim + 2 * 2
         )  # the 2*2 is for coordinates
 
@@ -87,10 +87,13 @@ class RelationNetworks(nn.Module):
 
         a = softmax_this(a)
         conv = torch.mul(conv, a.unsqueeze(2).unsqueeze(2))
+        #print("*********")
+        #print(conv.shape)
+        #print(self.coords.shape)
 
         w_tile = w.unsqueeze(1).expand(batch_size, n_pair * n_pair, w_dim)
-
         conv = torch.cat([conv, self.coords.expand(batch_size, 2, conv_h, conv_w)], 1)
+        #print(conv.shape)
         n_channel += 2
         conv_tr = conv.view(batch_size, n_channel, -1).permute(0, 2, 1)
         conv1 = conv_tr.unsqueeze(1).expand(batch_size, n_pair, n_pair, n_channel)
@@ -99,8 +102,11 @@ class RelationNetworks(nn.Module):
         conv2 = conv2.contiguous().view(-1, n_pair * n_pair, n_channel)
 
         concat_vec = torch.cat([conv1, conv2, w_tile], 2).view(-1, self.n_concat)
+        #print(concat_vec.shape)
         g = self.g(concat_vec)
+        #print(g.shape)
         g = g.view(-1, n_pair * n_pair, self.mlp_hidden).sum(1).squeeze()
+        #print(g.shape)
 
         return g
 
@@ -115,6 +121,7 @@ class RelationNetworks(nn.Module):
         g = torch.cat([g0, g1, latents.view([x0.size()[0], -1])], dim=1)
 
         f = self.f(g)
+        #print(f"f: {f.shape}")
 
         # stats(f, 'f before')
         # f = torch.sigmoid(f)
@@ -149,6 +156,14 @@ def softmax_this(input, beta=1.0):
     return input
 
 
+b = 10
+h = 30
+w = 30
+c = 3 
+x0 = torch.randint(0, 9, [b, c, h, w], dtype=torch.float)
+x1 = torch.randint(0, 9, [b, c, h, w], dtype=torch.float)
+z = torch.randn([b, 4, 64], dtype=torch.float)
+model = RelationNetworks(channels_out=64, latents_dim=64, use_wandb=False) 
+model((x0, x1), z)
 x = torch.randn([512, 4, 64]).permute([1, 0, 2])
 a, b, c, d = x
-a.shape

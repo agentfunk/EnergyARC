@@ -19,7 +19,7 @@ from tqdm import tqdm
 import dataset_arc
 from utils import *
 
-use_wandb = True
+use_wandb = False
 if use_wandb:
     import wandb
 if use_wandb:
@@ -284,7 +284,7 @@ if __name__ == "__main__":
         wandb.watch(model)
 
     dataset = dataset_arc.ARCDataset(
-        "/data/agentfunk/ARC-AGI/data/",
+        "/data/code/ARC-AGI/data/",
         "both",
         transform=dataset_arc.all_transforms,
         no_of_demos=no_of_demos,

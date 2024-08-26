@@ -5,7 +5,7 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 
-training_data_path = "/data/agentfunk/ARC-AGI/data/"
+training_data_path = "/data/code/ARC-AGI/data/"
 import os
 import torch
 from torch.utils.data import Dataset, DataLoader
